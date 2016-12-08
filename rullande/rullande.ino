@@ -37,25 +37,45 @@ void loop() {
   Serial.print(sensorValue2);
   Serial.println("");
 
+  driveForward();
+}
+
+void startLeftMotor() {
+  digitalWrite(motorPinB, HIGH);      // Establishes forward direction of Channel B
+  digitalWrite(brakePinB, LOW);       // Disengage the Brake for Channel B
+  analogWrite(speedPinB, motorSpeed); // Spins the motor on Channel B
+}
+
+void stopLeftMotor() {
+  digitalWrite(motorPinB, LOW);  // Turns off LED on motor shield
+  digitalWrite(brakePinB, HIGH); // Engage the Brake for Channel B
+}
+
+void startRightMotor() {
+  digitalWrite(motorPinA, LOW);       // Establishes forward direction of Channel A
+  digitalWrite(brakePinA, LOW);       // Disengage the Brake for Channel A
+  analogWrite(speedPinA, motorSpeed); // Spins the motor on Channel A
+}
+
+void stopRightMotor() {
+  digitalWrite(brakePinA, HIGH); // Engage the Brake for Channel A
+}
+
+void driveForward() {
   // If sensor 1 sees a bright surface, activate motor A, brake otherwise.
   if (sensorValue1 > 500) {
-    digitalWrite(motorPinA, LOW);       // Establishes forward direction of Channel A
-    digitalWrite(brakePinA, LOW);       // Disengage the Brake for Channel A
-    analogWrite(speedPinA, motorSpeed); // Spins the motor on Channel A
+    startRightMotor();
   }
   else {
-    digitalWrite(brakePinA, HIGH); // Engage the Brake for Channel A  
+    stopRightMotor();
   }
 
   // If sensor 2 sees a bright surface, activate motor B, brake otherwise.
   if (sensorValue2 > 500) {
-    digitalWrite(motorPinB, HIGH);      // Establishes forward direction of Channel B
-    digitalWrite(brakePinB, LOW);       // Disengage the Brake for Channel B
-    analogWrite(speedPinB, motorSpeed); // Spins the motor on Channel B
+    startLeftMotor();
   }
   else {
-    digitalWrite(motorPinB, LOW);  // Turns off LED on motor shield
-    digitalWrite(brakePinB, HIGH); // Engage the Brake for Channel B
+    stopLeftMotor();
   }
 }
 
