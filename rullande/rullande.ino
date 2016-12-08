@@ -1,7 +1,7 @@
 int sensorPin1 = A8; // Sensor 1 is connected to analog pin 8
 int sensorPin2 = A9;
-int sensorValue1 = 0;
-int sensorValue2 = 0;
+int rightSensorValue = 0;
+int leftSensorValue = 0;
 
 int motorPinA = 12; // Pin to set direction of motor A
 int brakePinA = 9;  // Pin to activate brake on motor A
@@ -27,14 +27,14 @@ void setup() {
 }
 
 void loop() {
-  sensorValue1 = analogRead(sensorPin1); // Read sensor value from sensor 1
-  sensorValue2 = analogRead(sensorPin2); // Read sensor value from sensor 2
+  leftSensorValue = analogRead(sensorPin2); // Read sensor value from sensor 2
+  rightSensorValue = analogRead(sensorPin1); // Read sensor value from sensor 1
 
   // If the robot is connected to the computer, this will print the sensor values to the serial monitor.
-  Serial.print("Sensor1: ");
-  Serial.print(sensorValue1);
-  Serial.print(" Sensor2: ");
-  Serial.print(sensorValue2);
+  Serial.print("Left sensor: ");
+  Serial.print(leftSensorValue);
+  Serial.print("Right sensor: ");
+  Serial.print(rightSensorValue);
   Serial.println("");
 
   driveForward();
@@ -61,21 +61,27 @@ void stopRightMotor() {
   digitalWrite(brakePinA, HIGH); // Engage the Brake for Channel A
 }
 
-void driveForward() {
-  // If sensor 1 sees a bright surface, activate motor A, brake otherwise.
-  if (sensorValue1 > 500) {
-    startRightMotor();
-  }
-  else {
-    stopRightMotor();
-  }
+bool isLeftSensorBright() {
+  return leftSensorValue > 500;
+}
 
-  // If sensor 2 sees a bright surface, activate motor B, brake otherwise.
-  if (sensorValue2 > 500) {
+bool isRightSensorBright() {
+  return rightSensorValue > 500;
+}
+
+void driveForward() {
+  if (isLeftSensorBright()) {
     startLeftMotor();
   }
   else {
     stopLeftMotor();
+  }
+
+  if (isRightSensorBright()) {
+    startRightMotor();
+  }
+  else {
+    stopRightMotor();
   }
 }
 
