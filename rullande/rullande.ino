@@ -12,6 +12,14 @@ int speedPinB = 11; // Pin to control speed of motor B
 
 int motorSpeed = 100; // Decides how fast the robot will go
 
+enum State {
+  FORWARD,
+  LEFT,
+  RIGHT,
+};
+
+State robotState = FORWARD;
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(LED_BUILTIN, OUTPUT);
@@ -37,7 +45,15 @@ void loop() {
   Serial.print(rightSensorValue);
   Serial.println("");
 
-  driveForward();
+  if (robotState == FORWARD) {
+    robotState = driveForward();
+  }
+  else if (robotState == LEFT) {
+    robotState = turnLeft();
+  }
+  else if (robotState == RIGHT) {
+    robotState = turnRight();
+  }
 }
 
 void startLeftMotor() {
@@ -69,7 +85,7 @@ bool isRightSensorBright() {
   return rightSensorValue > 500;
 }
 
-void driveForward() {
+State driveForward() {
   if (isLeftSensorBright()) {
     startLeftMotor();
   }
@@ -82,6 +98,40 @@ void driveForward() {
   }
   else {
     stopRightMotor();
+  }
+
+  if (isLeftSensorBright() || isRightSensorBright()) {
+    return FORWARD;
+  }
+  else {
+    // rand will give a number from 0 to 1, (not including 2).
+    return random(2) == 0 ? LEFT: RIGHT;
+  }
+}
+
+State turnLeft() {
+  stopLeftMotor();
+
+  if (isRightSensorBright()) {
+    stopRightMotor();
+    return FORWARD;
+  }
+  else {
+    startRightMotor();
+    return LEFT;
+  }
+}
+
+State turnRight() {
+  stopRightMotor();
+
+  if (isLeftSensorBright()) {
+    stopLeftMotor();
+    return FORWARD;
+  }
+  else {
+    startLeftMotor();
+    return RIGHT;
   }
 }
 
