@@ -12,10 +12,13 @@ int speedPinB = 11; // Pin to control speed of motor B
 
 int motorSpeed = 100; // Decides how fast the robot will go
 
+int serialByte = 0;
+
 enum State {
   FORWARD,
   LEFT,
   RIGHT,
+  USER_DECIDES,
 };
 
 State robotState = FORWARD;
@@ -39,11 +42,11 @@ void loop() {
   rightSensorValue = analogRead(sensorPin1); // Read sensor value from sensor 1
 
   // If the robot is connected to the computer, this will print the sensor values to the serial monitor.
-  Serial.print("Left sensor: ");
-  Serial.print(leftSensorValue);
-  Serial.print("Right sensor: ");
-  Serial.print(rightSensorValue);
-  Serial.println("");
+  //Serial.print("Left sensor: ");
+  //Serial.print(leftSensorValue);
+  //Serial.print("Right sensor: ");
+  //Serial.print(rightSensorValue);
+  //Serial.println("");
 
   if (robotState == FORWARD) {
     robotState = driveForward();
@@ -53,6 +56,9 @@ void loop() {
   }
   else if (robotState == RIGHT) {
     robotState = turnRight();
+  }
+  else if (robotState == USER_DECIDES) {
+    robotState = userDecides();
   }
 }
 
@@ -86,6 +92,7 @@ bool isRightSensorBright() {
 }
 
 State driveForward() {
+  Serial.println("driveForward");
   if (isLeftSensorBright()) {
     startLeftMotor();
   }
@@ -105,11 +112,13 @@ State driveForward() {
   }
   else {
     // rand will give a number from 0 to 1, (not including 2).
-    return random(2) == 0 ? LEFT: RIGHT;
+    //return random(2) == 0 ? LEFT: RIGHT;
+    return USER_DECIDES;
   }
 }
 
 State turnLeft() {
+  Serial.println("turnLeft");
   stopLeftMotor();
 
   if (isRightSensorBright()) {
@@ -123,6 +132,7 @@ State turnLeft() {
 }
 
 State turnRight() {
+  Serial.println("turnRight");
   stopRightMotor();
 
   if (isLeftSensorBright()) {
@@ -134,4 +144,23 @@ State turnRight() {
     return RIGHT;
   }
 }
+
+State userDecides() {
+  Serial.println("userDecides");
+  stopLeftMotor();
+  stopRightMotor();
+  Serial.println("Choose direction LEFT = 'a', RIGHT='d', FORWARD='w'");
+  serialByte = Serial.read();
+  if (serialByte == 'w') {
+    return FORWARD;
+  }
+  if (serialByte == 'a') {
+    return LEFT;
+  }
+  if (serialByte == 'd') {
+    return RIGHT;
+  }
+  return USER_DECIDES;
+}
+
 
