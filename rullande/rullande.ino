@@ -1,5 +1,8 @@
+#include <Servo.h>
+
 int sensorPin1 = A8; // Sensor 1 is connected to analog pin 8
 int sensorPin2 = A9;
+int servoPin = 30;
 int rightSensorValue = 0;
 int leftSensorValue = 0;
 
@@ -12,12 +15,19 @@ int speedPinB = 11; // Pin to control speed of motor B
 
 int motorSpeed = 100; // Decides how fast the robot will go
 
+int liftLowAngle = 45;
+int liftHighAngle = 100;
+
 int serialByte = 0;
+
+Servo myservo;
 
 enum State {
   FORWARD,
   LEFT,
   RIGHT,
+  RAISE_LIFT,
+  LOWER_LIFT,
   USER_DECIDES,
 };
 
@@ -35,6 +45,9 @@ void setup() {
   // Setup Channel B
   pinMode(motorPinB, OUTPUT); // Initiates Motor Channel B pin
   pinMode(brakePinB, OUTPUT); // Initiates Brake Channel B pin
+
+  // Setup Servo motors
+  myservo.attach(servoPin);  // Attaches the servo to the servo object
 }
 
 void loop() {
@@ -56,6 +69,12 @@ void loop() {
   }
   else if (robotState == RIGHT) {
     robotState = turnRight();
+  }
+  else if (robotState == RAISE_LIFT) {
+    robotState = raiseLift();
+  }
+  else if (robotState == LOWER_LIFT) {
+    robotState = lowerLift();
   }
   else if (robotState == USER_DECIDES) {
     robotState = userDecides();
@@ -145,11 +164,23 @@ State turnRight() {
   }
 }
 
+State raiseLift() {
+  Serial.println("raiseLift");
+  myservo.write(liftHighAngle);
+  return USER_DECIDES;
+}
+
+State lowerLift() {
+  Serial.println("lowerLift");
+  myservo.write(liftLowAngle);
+  return USER_DECIDES;
+}
+
 State userDecides() {
-  Serial.println("userDecides");
+  //Serial.println("userDecides");
   stopLeftMotor();
   stopRightMotor();
-  Serial.println("Choose direction LEFT = 'a', RIGHT='d', FORWARD='w'");
+  //Serial.println("Choose direction LEFT = 'a', RIGHT='d', FORWARD='w'");
   serialByte = Serial.read();
   if (serialByte == 'w') {
     return FORWARD;
@@ -159,6 +190,12 @@ State userDecides() {
   }
   if (serialByte == 'd') {
     return RIGHT;
+  }
+  if (serialByte == 'u') {
+    return RAISE_LIFT;
+  }
+  if (serialByte == 'n') {
+    return LOWER_LIFT;
   }
   return USER_DECIDES;
 }
