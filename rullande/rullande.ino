@@ -31,7 +31,7 @@ enum State {
   USER_DECIDES,
 };
 
-State robotState = FORWARD;
+State robotState = USER_DECIDES;
 
 void setup() {
   // put your setup code here, to run once:
