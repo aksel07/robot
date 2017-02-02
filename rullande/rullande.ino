@@ -15,8 +15,8 @@ int speedPinB = 11; // Pin to control speed of motor B
 
 int motorSpeed = 100; // Decides how fast the robot will go
 
-int liftLowAngle = 45;
-int liftHighAngle = 100;
+int liftLowAngle = 10;
+int liftHighAngle = 115;
 
 int serialByte = 0;
 
