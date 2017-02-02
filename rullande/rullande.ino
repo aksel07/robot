@@ -24,6 +24,7 @@ Servo myservo;
 
 enum State {
   FORWARD,
+  BACKWARD,
   LEFT,
   RIGHT,
   RAISE_LIFT,
@@ -64,6 +65,9 @@ void loop() {
   if (robotState == FORWARD) {
     robotState = driveForward();
   }
+  else if (robotState == BACKWARD) {
+    robotState = driveBackward();
+  }
   else if (robotState == LEFT) {
     robotState = turnLeft();
   }
@@ -87,6 +91,12 @@ void startLeftMotor() {
   analogWrite(speedPinB, motorSpeed); // Spins the motor on Channel B
 }
 
+void reverseLeftMotor() {
+  digitalWrite(motorPinB, LOW);       // Establishes backward direction of Channel B
+  digitalWrite(brakePinB, LOW);       // Disengage the Brake for Channel B
+  analogWrite(speedPinB, motorSpeed); // Spins the motor on Channel B
+}
+
 void stopLeftMotor() {
   digitalWrite(motorPinB, LOW);  // Turns off LED on motor shield
   digitalWrite(brakePinB, HIGH); // Engage the Brake for Channel B
@@ -94,6 +104,12 @@ void stopLeftMotor() {
 
 void startRightMotor() {
   digitalWrite(motorPinA, LOW);       // Establishes forward direction of Channel A
+  digitalWrite(brakePinA, LOW);       // Disengage the Brake for Channel A
+  analogWrite(speedPinA, motorSpeed); // Spins the motor on Channel A
+}
+
+void reverseRightMotor() {
+  digitalWrite(motorPinA, HIGH);      // Establishes backward direction of Channel A
   digitalWrite(brakePinA, LOW);       // Disengage the Brake for Channel A
   analogWrite(speedPinA, motorSpeed); // Spins the motor on Channel A
 }
@@ -134,6 +150,14 @@ State driveForward() {
     //return random(2) == 0 ? LEFT: RIGHT;
     return USER_DECIDES;
   }
+}
+
+State driveBackward() {
+  Serial.println("driveBackward");
+  reverseLeftMotor();
+  reverseRightMotor();
+  delay(1000);
+  return USER_DECIDES;
 }
 
 State turnLeft() {
@@ -184,6 +208,9 @@ State userDecides() {
   serialByte = Serial.read();
   if (serialByte == 'w') {
     return FORWARD;
+  }
+  if (serialByte == 's') {
+    return BACKWARD;
   }
   if (serialByte == 'a') {
     return LEFT;
